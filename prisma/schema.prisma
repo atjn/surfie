@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ScanResult {
+  Waiting
+  Scanning
+  Success
+  FoundCanonical
+  WrongLanguage
+  Blocked
+  Error
+}
+
+model Site {
+  id           Int        @id @default(autoincrement())
+  url          String     @unique @db.VarChar(200)
+  title        String?    @db.VarChar(60)
+  description  String?    @db.VarChar(160)
+  scanResult   ScanResult @default(Waiting)
+  scanPriority Int?
+  scanTime     DateTime?
+  error        String?    @db.VarChar(60)
+  canonicalId  Int?
+  canonical    Site?      @relation("Canonical", fields: [canonicalId], references: [id])
+  canonicalFor Site[]     @relation("Canonical")
+  nextId       Int?
+  next         Site?      @relation("Next", fields: [nextId], references: [id])
+  nextFor      Site[]     @relation("Next")
+  previousId   Int?
+  previous     Site?      @relation("Previous", fields: [previousId], references: [id])
+  previousFor  Site[]     @relation("Previous")
+  privPolId    Int?
+  privPol      Site?      @relation("PrivacyPolicy", fields: [privPolId], references: [id])
+  privPolFor   Site[]     @relation("PrivacyPolicy")
+  tosId        Int?
+  tos          Site?      @relation("TermsOfService", fields: [tosId], references: [id])
+  tosFor       Site[]     @relation("TermsOfService")
+  LinksTo      Site[]     @relation("Link")
+  LinkedFrom   Site[]     @relation("Link")
+}
+
+model Host {
+  id     Int    @id @default(autoincrement())
+  host   String @unique @db.VarChar(200)
+  robots String @db.VarChar(512000)
+}
