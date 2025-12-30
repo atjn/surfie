@@ -1,6 +1,6 @@
 import { parse } from "parse5";
 import { find, getAttr, getTextContent } from "./lib/traverser.js";
-import { isProbablyDocument, sanitizeUrl, urlHost } from "./lib/url.js";
+import { isProbablyDocument, sanitizeUrl, urlHost } from ".//lib/url.js";
 import { Prisma, PrismaClient, ScanResult } from "@prisma/client";
 import { maxLength, singleLine } from "./lib/string.js";
 import { createPool } from "./lib/pool.js";
@@ -12,6 +12,7 @@ import {
 	parseRobotsTag,
 	parseRobotsTxt,
 } from "./lib/robots.js";
+import { tokenize } from "./lib/text.js";
 
 const prisma = new PrismaClient();
 
@@ -253,6 +254,14 @@ export async function scanUrl(url: string): Promise<void> {
 			}
 		}
 	}
+	const terms = tokenize(
+		getTextContent(find(htmlTag, { tagName: "body", depth: 1 })[0]),
+	);
+	result.terms = {
+		connectOrCreate: [...terms].map((term) => {
+			return { where: { term }, create: { term } };
+		}),
+	};
 	const links = new Set(
 		robots.follow
 			? find(document, { tagName: "a", attrs: ["href"] })
@@ -265,7 +274,7 @@ export async function scanUrl(url: string): Promise<void> {
 					.filter((href) => href.length <= 200)
 			: [],
 	);
-	result.LinksTo = {
+	result.linksTo = {
 		connectOrCreate: [...links].map((url) => {
 			return { where: { url }, create: { url } };
 		}),

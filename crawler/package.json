@@ -1,0 +1,21 @@
+{
+	"type": "module",
+	"scripts": {
+		"run": "vite-node main.ts",
+		"cleardb": "prisma migrate reset",
+		"generatedb": "prisma migrate dev",
+		"format": "prettier --write . && prisma format"
+	},
+	"dependencies": {
+		"@prisma/client": "^6.1.0",
+		"@stdlib/nlp-porter-stemmer": "^0.2.2",
+		"core-js": "^3.40.0",
+		"parse5": "^7.2.1",
+		"prisma": "^6.1.0",
+		"typescript": "^5.7.2",
+		"vite-node": "^2.1.8"
+	},
+	"devDependencies": {
+		"prettier": "^3.4.2"
+	}
+}

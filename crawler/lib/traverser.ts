@@ -74,12 +74,15 @@ export function getAttr(
 export function getTextContent(
 	node: DefaultTreeAdapterTypes.Document | DefaultTreeAdapterTypes.ChildNode,
 ): string {
-	let content = "";
-	const nodes = find(node, { nodeName: "#text" });
-	for (const node of nodes) {
-		if ("value" in node) {
-			content += node.value;
-		}
-	}
-	return content;
+	const nodes = find(node, { nodeName: "#text" }).filter(
+		(node) =>
+			"parentNode" in node &&
+			node.parentNode &&
+			!["script", "style"].includes(node.parentNode.nodeName),
+	);
+	return nodes
+		.filter((node) => "value" in node)
+		.map((node) => node.value)
+		.join(" ")
+		.replaceAll("  ", " ");
 }

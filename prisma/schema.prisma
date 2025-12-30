@@ -47,12 +47,19 @@ model Site {
   tosId        Int?
   tos          Site?      @relation("TermsOfService", fields: [tosId], references: [id])
   tosFor       Site[]     @relation("TermsOfService")
-  LinksTo      Site[]     @relation("Link")
-  LinkedFrom   Site[]     @relation("Link")
+  linksTo      Site[]     @relation("Link")
+  linkedFrom   Site[]     @relation("Link")
+  terms        Term[]     @relation("Term")
 }
 
 model Host {
   id     Int    @id @default(autoincrement())
   host   String @unique @db.VarChar(200)
   robots String @db.VarChar(512000)
+}
+
+model Term {
+  id    Int    @id @default(autoincrement())
+  term  String @unique
+  sites Site[] @relation("Term")
 }
